@@ -14,44 +14,59 @@ public class LoanApprovalService {
      * - >= 650 -> si amount <= income*8 -> APPROVED; si no -> MANUAL_REVIEW
      * - Además, si el cliente es VIP y score>=600 y no tiene impagos -> se eleva a APPROVED si estaba en MANUAL_REVIEW
      */
-    public Decision evaluateLoan(
-            Applicant applicant,
-            int amountRequested,
-            int termMonths
-    ) {
-        validate(applicant, amountRequested, termMonths);
-
-        int score = applicant.creditScore();
-        boolean hasDefaults = applicant.hasRecentDefaults();
-        int income = applicant.monthlyIncome();
-
-        Decision decision;
-
-        if (score < 500) {
-            decision = Decision.REJECTED;
-        } else if (score < 650) {
-            if (income >= 2500 && !hasDefaults) {
-                decision = Decision.MANUAL_REVIEW;
-            } else {
-                decision = Decision.REJECTED;
-            }
+public Decision evaluateLoan(Applicant applicant, int amountRequested, int termMonths) {
+    // NODO 1: Entrada validate()
+    validate(applicant, amountRequested, termMonths);
+    
+    // NODO 2: Extraer datos
+    int score = applicant.creditScore();
+    boolean hasDefaults = applicant.hasRecentDefaults();
+    int income = applicant.monthlyIncome();
+    
+    // NODO 3: Inicializar decision
+    Decision decision;
+    
+    // NODO 4: score < 500?
+    if (score < 500) {
+        // NODO 5: REJECTED directo
+        decision = Decision.REJECTED;
+    } 
+    // NODO 6: else if score < 650?
+    else if (score < 650) {
+        // NODO 7: income >= 2500 && !hasDefaults?
+        if (income >= 2500 && !hasDefaults) {
+            // NODO 8: MANUAL_REVIEW
+            decision = Decision.MANUAL_REVIEW;
         } else {
-            if (amountRequested <= income * 8) {
-                decision = Decision.APPROVED;
-            } else {
-                decision = Decision.MANUAL_REVIEW;
-            }
+            // NODO 9: REJECTED
+            decision = Decision.REJECTED;
         }
-
-        if (decision == Decision.MANUAL_REVIEW
-                && applicant.isVip()
-                && score >= 600
-                && !hasDefaults) {
+    } 
+    // NODO 10: else (score >= 650)
+    else {
+        // NODO 11: amountRequested <= income * 8?
+        if (amountRequested <= income * 8) {
+            // NODO 12: APPROVED
             decision = Decision.APPROVED;
+        } else {
+            // NODO 13: MANUAL_REVIEW
+            decision = Decision.MANUAL_REVIEW;
         }
-
-        return decision;
     }
+    
+    // NODO 14: if MANUAL_REVIEW && VIP && score>=600 && !hasDefaults?
+    if (decision == Decision.MANUAL_REVIEW
+        && applicant.isVip()
+        && score >= 600
+        && !hasDefaults) {
+        // NODO 15: Eleva a APPROVED
+        decision = Decision.APPROVED;
+    }
+    
+    // NODO 16: Salida return decision
+    return decision;
+}
+
 
     private void validate(Applicant applicant, int amountRequested, int termMonths) {
         Objects.requireNonNull(applicant, "applicant cannot be null");
