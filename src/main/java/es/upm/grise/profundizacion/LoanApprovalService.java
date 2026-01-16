@@ -88,6 +88,5 @@ public Decision evaluateLoan(Applicant applicant, int amountRequested, int termM
         APPROVED, MANUAL_REVIEW, REJECTED
     }
 
-    public record Applicant(int monthlyIncome, int creditScore, boolean hasRecentDefaults, boolean isVip) { }
 }
 
